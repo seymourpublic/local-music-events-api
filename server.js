@@ -10,6 +10,8 @@ const artistRoutes = require('./routes/artistRoutes');
 const venueRoutes = require('./routes/venueRoutes');
 const genreRoutes = require('./routes/genreRoutes');
 const userRoutes = require('./routes/userRoutes');
+const rsvpRoutes = require('./routes/rsvpRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 const app = express();
 connectDB();
@@ -23,6 +25,8 @@ app.use('/api/artists', artistRoutes);
 app.use('/api/venues', venueRoutes);
 app.use('/api/genres', genreRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/rsvp', rsvpRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.get('/', (req, res) => res.send('Local Music Events API Running'));
 
