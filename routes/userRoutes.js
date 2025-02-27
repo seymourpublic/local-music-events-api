@@ -3,14 +3,17 @@ const { getAllUsers, createUser, getUserById, updateUser, deleteUser, followUser
 const { authenticate, authorizeRoles } = require('../middleware/authMiddleware');
 const router = express.Router();
 
+// Public Routes
 router.get('/', getAllUsers);
-router.post('/', createUser);
 router.get('/:id', getUserById);
-router.put('/:id', updateUser);
-router.delete('/:id', deleteUser);
-router.post('/follow', followUser);
-router.get('/:id', getUserProfile); 
-router.get('/dashboard/:userId', getUserDashboard); // Get user dashboard (public)
+
+// Protected Routes
+router.post('/', authenticate, authorizeRoles('organizer'),createUser);
+router.put('/:id', authenticate, authorizeRoles('organizer'),updateUser);
+router.delete('/:id',authenticate, authorizeRoles('organizer'), deleteUser);
+router.post('/follow',authenticate, authorizeRoles('organizer'), followUser);
+router.get('/:id',authenticate, authorizeRoles('organizer'), getUserProfile); 
+router.get('/dashboard/:userId',authenticate, authorizeRoles('organizer'), getUserDashboard); // Get user dashboard (public)
 
 
 module.exports = router;

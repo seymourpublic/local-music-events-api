@@ -4,7 +4,10 @@ const { authenticate, authorizeRoles } = require('../middleware/authMiddleware')
 
 const router = express.Router();
 
+//public route
 router.get('/:eventId/reviews', getEventReviews); // Get reviews for an event
-router.post('/:eventId/reviews', createReview); // Add a review (no authentication)
+
+//protected route
+router.post('/:eventId/reviews',authenticate, authorizeRoles('organizer'), createReview); // Add a review (no authentication)
 
 module.exports = router;

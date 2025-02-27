@@ -3,10 +3,13 @@ const { getAllGenres, createGenre, getGenreById, updateGenre, deleteGenre } = re
 const { authenticate, authorizeRoles } = require('../middleware/authMiddleware');
 const router = express.Router();
 
+//public routes
 router.get('/', getAllGenres);
-router.post('/', createGenre);
 router.get('/:id', getGenreById);
-router.put('/:id', updateGenre);
-router.delete('/:id', deleteGenre);
+
+//protected routes
+router.post('/', authenticate, authorizeRoles('organizer'), createGenre);
+router.put('/:id',authenticate, authorizeRoles('organizer'), updateGenre);
+router.delete('/:id',authenticate, authorizeRoles('organizer'), deleteGenre);
 
 module.exports = router;

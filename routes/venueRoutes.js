@@ -3,10 +3,13 @@ const { getAllVenues, createVenue, getVenueById, updateVenue, deleteVenue } = re
 const { authenticate, authorizeRoles } = require('../middleware/authMiddleware');
 const router = express.Router();
 
+// Public Routes
 router.get('/', getAllVenues);
-router.post('/', createVenue);
 router.get('/:id', getVenueById);
-router.put('/:id', updateVenue);
-router.delete('/:id', deleteVenue);
+
+// Protected Routes
+router.post('/', authenticate, authorizeRoles('organizer'), createVenue);
+router.put('/:id', authenticate, authorizeRoles('organizer'), updateVenue);
+router.delete('/:id', authenticate, authorizeRoles('organizer'), deleteVenue);
 
 module.exports = router;

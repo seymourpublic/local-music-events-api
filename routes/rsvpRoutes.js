@@ -3,10 +3,13 @@ const { getAllRSVPs, createRSVP, getRSVPById, updateRSVP, deleteRSVP } = require
 const { authenticate, authorizeRoles } = require('../middleware/authMiddleware');
 const router = express.Router();
 
+// Public Routes
 router.get('/', getAllRSVPs);
-router.post('/', createRSVP);
 router.get('/:id', getRSVPById);
-router.put('/:id', updateRSVP);
-router.delete('/:id', deleteRSVP);
+
+// Protected Routes
+router.post('/',authenticate, authorizeRoles('organizer'), createRSVP);
+router.put('/:id',authenticate, authorizeRoles('organizer'), updateRSVP);
+router.delete('/:id',authenticate, authorizeRoles('organizer'), deleteRSVP);
 
 module.exports = router;
