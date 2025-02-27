@@ -1,5 +1,6 @@
 const express = require('express');
 const { getAllArtists, createArtist, getArtistById, updateArtist, deleteArtist } = require('../controllers/artistController');
+const { authenticate, authorizeRoles } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.get('/', getAllArtists);
