@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getCurrentUser } = require('../controllers/authController');
+const { registerUser, loginUser, getCurrentUser, loginUser, refreshAccessToken, logoutUser } = require('../controllers/authController');
 const { authenticate } = require('../middleware/authMiddleware');
 const { body } = require('express-validator');
 
@@ -29,5 +29,6 @@ router.post(
 
 // Get Current User (Protected)
 router.get('/me', authenticate, getCurrentUser);
-
+router.post('/refresh-token', refreshAccessToken);
+router.post('/logout', logoutUser);
 module.exports = router;
