@@ -4,16 +4,15 @@ const { authenticate, authorizeRoles } = require('../middleware/authMiddleware')
 const router = express.Router();
 
 // Public Routes
-router.get('/', getAllUsers);
-router.get('/:id', getUserById);
+router.post('/', createUser);  // Anyone can register
+router.get('/:id', getUserProfile);  // User profiles are public
 
 // Protected Routes
-router.post('/', authenticate, authorizeRoles('organizer'),createUser);
-router.put('/:id', authenticate, authorizeRoles('organizer'),updateUser);
-router.delete('/:id',authenticate, authorizeRoles('organizer'), deleteUser);
-router.post('/follow',authenticate, authorizeRoles('organizer'), followUser);
-router.get('/:id',authenticate, authorizeRoles('organizer'), getUserProfile); 
-router.get('/dashboard/:userId',authenticate, authorizeRoles('organizer'), getUserDashboard); // Get user dashboard (public)
+router.get('/', authenticate, authorizeRoles('admin'), getAllUsers);  // Only admins can see all users
+router.put('/:id', authenticate, authorizeRoles('admin', 'organizer'), updateUser);  // Admins & organizers can update users
+router.delete('/:id', authenticate, authorizeRoles('admin'), deleteUser);  // Only admins can delete users
+router.post('/follow', authenticate, followUser);  // Any authenticated user can follow others
+router.get('/dashboard/:userId', authenticate, getUserDashboard);  // Only logged-in users can see their dashboard
 
 
 module.exports = router;
