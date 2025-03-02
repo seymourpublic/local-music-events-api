@@ -63,37 +63,98 @@ npm run dev  # Development Mode (Nodemon)
 ```
 
 ## 🔐 Authentication & Authorization
-- **User Roles:** `Artist`, `Organizer`, `Attendee`
-- **Login & Register:**
-```bash
-POST /api/auth/register  # Create Account
-POST /api/auth/login  # Login and get tokens
-POST /api/auth/refresh-token  # Refresh Access Token
-POST /api/auth/logout  # Logout
-```
-- **Protected Routes (Require Bearer Token)**:
-```bash
-GET /api/users/me  # Get Current User Profile
-POST /api/events  # Create Event (Organizer Only)
+### **User Roles:** `Artist`, `Organizer`, `Attendee`
+
+### **Authentication Routes**
+#### **Register User**
+**Endpoint:** `POST /api/auth/register`
+**Request Body:**
+```json
+{
+    "name": "John Doe",
+    "email": "johndoe@example.com",
+    "password": "password123",
+    "role": "organizer"
+}
 ```
 
-## 📡 Real-Time Features (Socket.io)
-- **User receives a real-time notification when followed**
-- **Event organizers get live RSVP updates**
-- **Socket.io handles real-time messaging and event updates**
+#### **Login User**
+**Endpoint:** `POST /api/auth/login`
+**Request Body:**
+```json
+{
+    "email": "johndoe@example.com",
+    "password": "password123"
+}
+```
 
-## 📌 API Routes
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/auth/register` | Register a new user |
-| `POST` | `/api/auth/login` | Login user and get JWT |
-| `POST` | `/api/auth/refresh-token` | Refresh access token |
-| `GET` | `/api/users/:id` | Get user profile |
-| `POST` | `/api/users/follow` | Follow a user |
-| `POST` | `/api/events` | Create an event (Organizer Only) |
-| `GET` | `/api/events` | Fetch all events |
-| `GET` | `/api/artists` | Fetch all artists |
-| `POST` | `/api/rsvp` | RSVP to an event |
+#### **Refresh Token**
+**Endpoint:** `POST /api/auth/refresh-token`
+
+#### **Logout**
+**Endpoint:** `POST /api/auth/logout`
+
+## 📌 API Routes & Structure
+### **User Management**
+#### **Get All Users**
+**Endpoint:** `GET /api/users`
+
+#### **Get User Profile**
+**Endpoint:** `GET /api/users/:id`
+
+#### **Follow a User**
+**Endpoint:** `POST /api/users/follow`
+**Request Body:**
+```json
+{
+    "userId": "65cfd7a8b25a4e4a7c123456", 
+    "followerId": "65cfd7a8b25a4e4a7c987654"
+}
+```
+
+### **Event Management**
+#### **Create an Event**
+**Endpoint:** `POST /api/events`
+**Request Body:**
+```json
+{
+    "name": "Live Rock Show",
+    "date_time": "2025-06-15T19:00:00Z",
+    "venue_id": "65cfd7a8b25a4e4a7c123456",
+    "genre_id": "65cfd7a8b25a4e4a7c654321",
+    "ticket_price": 20.00
+}
+```
+
+#### **Get All Events**
+**Endpoint:** `GET /api/events`
+
+#### **RSVP to an Event**
+**Endpoint:** `POST /api/rsvp`
+**Request Body:**
+```json
+{
+    "event_id": "65cfd7a8b25a4e4a7c567890",
+    "user_id": "65cfd7a8b25a4e4a7c123456",
+    "status": "Going"
+}
+```
+
+### **Artist Management**
+#### **Get All Artists**
+**Endpoint:** `GET /api/artists`
+
+#### **Create an Artist Profile**
+**Endpoint:** `POST /api/artists`
+**Request Body:**
+```json
+{
+    "name": "The Indie Band",
+    "bio": "A group of indie musicians performing across the country.",
+    "genre_id": "65cfd7a8b25a4e4a7c654321",
+    "user_id": "65cfd7a8b25a4e4a7c987654"
+}
+```
 
 ## 📜 License
 This project is licensed under the **MIT License**.
@@ -103,4 +164,4 @@ Feel free to submit a PR or open an issue if you find a bug or have feature sugg
 
 ## 📬 Contact
 - **Author:** Naledi
-- **Email:** naledisandamela@gmail.com
+- **Email:** Naledisandamela@gmail.com
