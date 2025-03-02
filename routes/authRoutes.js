@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getCurrentUser, loginUser, refreshAccessToken, logoutUser } = require('../controllers/authController');
+const { registerUser, getCurrentUser, loginUser, refreshAccessToken, logoutUser } = require('../controllers/authController');
 const { authenticate } = require('../middleware/authMiddleware');
 const { body } = require('express-validator');
 

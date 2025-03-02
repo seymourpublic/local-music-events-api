@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { generateTokens } = require('../utils/jwtUtils');
+const { generateTokens, verifyRefreshToken  } = require('../utils/jwtUtils');
 const { validationResult } = require('express-validator');
 require('dotenv').config();
 
