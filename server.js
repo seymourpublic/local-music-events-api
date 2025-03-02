@@ -26,7 +26,13 @@ const io = socketIo(server, {
 });
 connectDB();
 
-app.use(cors());// enable access from anywhere and using anything on this specific cors
+const corsOptions = {
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allow common HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allow these headers
+  };
+
+app.use(cors(corsOptions));// enable access from anywhere and using anything on this specific cors
 app.use(bodyParser.json());
 
 const onlineUsers = new Map();
