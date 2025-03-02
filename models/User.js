@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+const NotificationSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Receiver
+    sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Follower
+    type: { type: String, enum: ['follow'], required: true },
+    message: { type: String, required: true },
+    read: { type: Boolean, default: false },
+    created_at: { type: Date, default: Date.now }
+});
+
 const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },

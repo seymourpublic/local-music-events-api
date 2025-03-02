@@ -52,7 +52,7 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
-// Follow a user without authentication
+// Follow a user and send a real-time notification
 exports.followUser = async (req, res) => {
     try {
         const { userId, followerId } = req.body;
@@ -73,7 +73,21 @@ exports.followUser = async (req, res) => {
         }
 
         user.following.push(followerId);
+
+        // Create notification
+        const notification = {
+            user: userId,
+            sender: followerId,
+            type: 'follow',
+            message: `${follower.name} started following you!`,
+            read: false
+        };
+
+        user.notifications.push(notification);
         await user.save();
+
+        // Emit real-time notification to the followed user
+        io.to(userId.toString()).emit('notification', notification);
 
         res.json({ message: "Followed successfully", following: user.following });
     } catch (error) {
@@ -102,6 +116,19 @@ exports.getUserDashboard = async (req, res) => {
         const rsvps = await RSVP.find({ user_id: userId }).populate('event_id', 'name date_time venue_id');
 
         res.json({ user, rsvps });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getUserNotifications = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId).select('notifications').populate('notifications.sender', 'name profile_picture');
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.json(user.notifications);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
+const http = require('http');
+const socketIo = require('socket.io');
 require('dotenv').config();
 
 
@@ -15,11 +17,39 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 connectDB();
 
 app.use(cors());// enable access from anywhere and using anything on this specific cors
 app.use(bodyParser.json());
 
+const onlineUsers = new Map();
+io.on("connection", (socket) => {
+    console.log("User connected:", socket.id);
+
+    socket.on("register", (userId) => {
+        onlineUsers.set(userId, socket.id);
+        socket.join(userId);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("User disconnected:", socket.id);
+        for (let [userId, socketId] of onlineUsers.entries()) {
+            if (socketId === socket.id) {
+                onlineUsers.delete(userId);
+                break;
+            }
+        }
+    });
+});
+app.set("io", io);
+module.exports.io = io;
 // Import routes
 app.use('/api/events', eventRoutes);
 app.use('/api/artists', artistRoutes);
