@@ -89,16 +89,24 @@ exports.deleteEvent = async (req, res) => {
 /**
  * Uploads image to Firedrop API
  */
-const uploadToFiredrop = async (filePath) => {
+const uploadToFiredrop = async (file) => {
     try {
         const formData = new FormData();
-        formData.append('file', fs.createReadStream(filePath));
+        const fileExtension = path.extname(file.originalname); // Get the original file extension
+        const newFilePath = `${file.path}${fileExtension}`; // Append the correct extension
+
+        fs.renameSync(file.path, newFilePath); // Rename the file to include extension
+
+        formData.append('file', fs.createReadStream(newFilePath), {
+            filename: file.originalname, // Preserve original filename
+            contentType: file.mimetype, // Preserve original MIME type
+        });
 
         const response = await axios.post('https://firedrop-api.onrender.com/upload', formData, {
             headers: { ...formData.getHeaders() }
         });
 
-        return response.data.url; 
+        return response.data.url; // Assuming Firedrop API returns image URL
     } catch (error) {
         throw new Error('Image upload failed');
     }
