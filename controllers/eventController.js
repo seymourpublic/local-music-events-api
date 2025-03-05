@@ -2,10 +2,15 @@ const Event = require('../models/Event');
 const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
+const path = require('path');
 
 exports.getAllEvents = async (req, res) => {
     try {
-        const events = await Event.find().populate('venue_id genre_id created_by');
+        const events = await Event.find()
+            .populate('venue_id', 'name location capacity') // Populate venue details
+            .populate('genre_id', 'name') // Populate genre name
+            .populate('created_by', 'name email profile_picture') // Populate creator details
+            .select('-__v'); // Exclude version key
         res.json(events);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -21,7 +26,8 @@ exports.createEvent = async (req, res) => {
         let eventImageUrl = null;
 
         if (req.file) {
-            eventImageUrl = await uploadToFiredrop(req.file.path);
+            console.log("File received for upload:", req.file);
+            eventImageUrl = await uploadToFiredrop(req.file); // ✅ Pass full file object
         }
 
         const event = new Event({
@@ -62,7 +68,8 @@ exports.updateEvent = async (req, res) => {
         let eventImageUrl = null;
 
         if (req.file) {
-            eventImageUrl = await uploadToFiredrop(req.file.path);
+            console.log("File received for update:", req.file);
+            eventImageUrl = await uploadToFiredrop(req.file); // ✅ Pass full file object
         }
 
         const updatedEvent = await Event.findByIdAndUpdate(
@@ -91,23 +98,37 @@ exports.deleteEvent = async (req, res) => {
  */
 const uploadToFiredrop = async (file) => {
     try {
+        console.log("Received file object:", file);
+
+        // Ensure file object is valid
+        if (!file || !file.path || !file.originalname) {
+            console.error("Invalid file object received:", file);
+            throw new Error("Invalid file. Ensure Multer is configured correctly.");
+        }
+
+        // Preserve original file extension
+        const fileExtension = path.extname(file.originalname) || '.jpg';
+        const newFilePath = `${file.path}${fileExtension}`; // Append correct extension
+
+        console.log("Renaming file:", file.path, "to", newFilePath);
+        fs.renameSync(file.path, newFilePath); // Rename file to keep extension
+
+        // Prepare FormData
         const formData = new FormData();
-        const fileExtension = path.extname(file.originalname); // Get the original file extension
-        const newFilePath = `${file.path}${fileExtension}`; // Append the correct extension
-
-        fs.renameSync(file.path, newFilePath); // Rename the file to include extension
-
         formData.append('file', fs.createReadStream(newFilePath), {
-            filename: file.originalname, // Preserve original filename
-            contentType: file.mimetype, // Preserve original MIME type
+            filename: file.originalname,
+            contentType: file.mimetype,
         });
 
+        console.log("Uploading file to Firedrop...");
         const response = await axios.post('https://firedrop-api.onrender.com/upload', formData, {
             headers: { ...formData.getHeaders() }
         });
 
-        return response.data.url; // Assuming Firedrop API returns image URL
+        console.log("Firedrop Response:", response.data);
+        return response.data.url; // Assuming Firedrop API returns an image URL
     } catch (error) {
+        console.error("Image Upload Error:", error.response ? error.response.data : error.message);
         throw new Error('Image upload failed');
     }
 };
